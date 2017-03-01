@@ -9,10 +9,7 @@ import java.util.List;
  */
 public class StatisticsEngine {
 
-    private static final int MAXROWS = 1000;
     private SqlConnector dbconnector;
-    public int cleanedRows = 0;
-    public int lastStatsStartTime = -1;
 
     public StatisticsEngine(SqlConnector sql){
         dbconnector = sql;
