@@ -79,6 +79,20 @@ public class StatisticsService {
         engine.fillStationMeansTable();
     }
 
+    @GET
+    @Path("/meansSampled")
+    public void calculateMeansSampled() {
+        // Setup SQL connection
+        SqlConnector sql = new SqlConnector();
+        sql.importPropertiesFromFile(propertiesPath);
+
+        // Init cleaner class
+        StatisticsEngine engine = new StatisticsEngine(sql);
+
+        // Start filling movements
+        engine.fillStationSampledTable();
+    }
+
     @POST
     @Path("/")
     public void post() {
