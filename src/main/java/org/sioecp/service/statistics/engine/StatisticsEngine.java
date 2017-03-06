@@ -2,6 +2,8 @@ package org.sioecp.service.statistics.engine;
 
 import org.sioecp.service.statistics.tools.SqlConnector;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -81,5 +83,11 @@ public class StatisticsEngine {
                 "from dw_station_state " +
                 "WHERE last_update >= " + lastRangeEnd +
                 " GROUP BY round(last_update / 120))");
+    }
+
+    private List<List<String>> getStatisticsPerDay(LocalDate date) {
+        List<List<String>> res = dbconnector.execRead("SELECT * FROM DW_station_means " +
+                "Where date(from_unixtime(range_start)) = " + java.sql.Date.valueOf(date));
+        return res;
     }
 }

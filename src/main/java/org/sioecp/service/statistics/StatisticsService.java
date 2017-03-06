@@ -58,7 +58,7 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init cleaner class
+        // Init StatisticsEngine class
         StatisticsEngine engine = new StatisticsEngine(sql);
 
         // Start filling movements
@@ -72,7 +72,7 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init cleaner class
+        // Init StatisticsEngine class
         StatisticsEngine engine = new StatisticsEngine(sql);
 
         // Start filling movements
@@ -86,7 +86,7 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init cleaner class
+        // Init StatisticsEngine class
         StatisticsEngine engine = new StatisticsEngine(sql);
 
         // Start filling movements
