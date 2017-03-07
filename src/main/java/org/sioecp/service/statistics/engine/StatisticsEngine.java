@@ -24,6 +24,20 @@ public class StatisticsEngine {
         return Integer.parseInt(res.get(0));
     }
 
+    private int getRangeStart() {
+        List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
+                "ORDER BY id ASC " +
+                "LIMIT 1").get(0);
+        return Integer.parseInt(res.get(0));
+    }
+
+    private int getRangeEnd() {
+        List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
+                "ORDER BY id DESC " +
+                "LIMIT 1").get(0);
+        return Integer.parseInt(res.get(0));
+    }
+
     private int getlastSMRow() {
         List<String> res = dbconnector.execRead("SELECT range_end FROM DW_station_means " +
                 "ORDER BY id DESC " +
@@ -52,24 +66,26 @@ public class StatisticsEngine {
                 "as move " +
                 "from dw_station_state as state " +
                 "WHERE state.movements is null AND state.id <> "+ firstRow +") as calculus " +
-                "SET st_state.movements = calculus.move" +
+                "SET st_state.movements = calculus.move " +
                 "WHERE st_state.id = calculus.state_id");
     }
 
     // Fills station means table with calculated statistics
     public void fillStationMeansTable(){
-        int lastRangeEnd=getlastSMRow();
+        int rangeEnd=getRangeEnd();
+        int rangeStart=getRangeStart();
         dbconnector.execWrite("INSERT INTO DW_station_means (id, id_station, week_day, range_start, range_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, movement_mean_rain, movement_mean_sun) " +
-                "(SELECT null,id_station, dayofweek(from_unixtime(timestamp_start)), timestamp_start, " +
-                "unix_timestamp(addtime(FROM_UNIXTIME(timestamp_start), '00:30:00')), " +
+                "(SELECT null,id_station, dayofweek(from_unixtime(" + rangeStart +
+                ")), " + rangeStart +
+                ", " + rangeEnd +
+                ", " +
                 "round(AVG(movement_mean),1), " +
                 "round(AVG(availability_mean),1), " +
-                "round(AVG(velib_nb_mean),1), round(count(weather=\"rain\")/count(*),1), " +
-                "round(count(weather=\"sun\")/count(*),1) " +
-                "FROM DW_station_sampled " +
-                "WHERE timestamp_start >= " + lastRangeEnd +
-                " GROUP BY round(timestamp_start / 1800))");
+                "round(AVG(velib_nb_mean),1), " +
+                "round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather='rain'),1), " +
+                "round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather='sun'),1) " +
+                "FROM DW_station_sampled)");
     }
 
     // Fills station sampled table with calculated statistics
@@ -78,11 +94,11 @@ public class StatisticsEngine {
         dbconnector.execWrite("INSERT INTO dw_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, weather) " +
                 "(select null, id_station, last_update, " +
-                "unix_timestamp(addtime(FROM_UNIXTIME(last_update), '00:02:00')), " +
+                "unix_timestamp(addtime(FROM_UNIXTIME(last_update), '00:30:00')), " +
                 "round(AVG(movements),1), round(AVG(available_bike_stands),1), round(AVG(available_bikes),1), null " +
                 "from dw_station_state " +
                 "WHERE last_update >= " + lastRangeEnd +
-                " GROUP BY round(last_update / 120))");
+                " GROUP BY round(last_update / 1800))");
     }
 
     private List<List<String>> getStatisticsPerDay(LocalDate date) {

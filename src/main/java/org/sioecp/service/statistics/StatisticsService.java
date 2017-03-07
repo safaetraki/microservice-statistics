@@ -66,8 +66,8 @@ public class StatisticsService {
     }
 
     @GET
-    @Path("/meansByPeriod")
-    public void calculateMeansByPeriod() {
+    @Path("/means")
+    public void calculateMeans() {
         // Setup SQL connection
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
