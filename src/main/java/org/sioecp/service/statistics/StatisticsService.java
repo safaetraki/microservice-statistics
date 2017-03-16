@@ -33,22 +33,8 @@ public class StatisticsService {
 
     private String propertiesPath;
 
-    public StatisticsService(){
-        // Default value
-        this.propertiesPath = "config.properties";
-    }
-
     public StatisticsService(String propertiesPath){
         this.propertiesPath = propertiesPath;
-    }
-
-
-    @GET
-    @Path("/")
-    public String get() {
-        // TODO: Implementation for HTTP GET request
-        System.out.println("GET invoked");
-        return "Hello from WSO2 MSF4J";
     }
 
     @GET
@@ -91,26 +77,5 @@ public class StatisticsService {
 
         // Start filling movements
         engine.fillStationSampledTable();
-    }
-
-    @POST
-    @Path("/")
-    public void post() {
-        // TODO: Implementation for HTTP POST request
-        System.out.println("POST invoked");
-    }
-
-    @PUT
-    @Path("/")
-    public void put() {
-        // TODO: Implementation for HTTP PUT request
-        System.out.println("PUT invoked");
-    }
-
-    @DELETE
-    @Path("/")
-    public void delete() {
-        // TODO: Implementation for HTTP DELETE request
-        System.out.println("DELETE invoked");
     }
 }

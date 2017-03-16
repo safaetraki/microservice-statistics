@@ -38,18 +38,14 @@ public class StatisticsEngine {
         return Integer.parseInt(res.get(0));
     }
 
-    private int getlastSMRow() {
-        List<String> res = dbconnector.execRead("SELECT range_end FROM DW_station_means " +
+    private int getlastSSaRow() {
+        List<List<String>> res = dbconnector.execRead("SELECT timestamp_end FROM DW_station_sampled " +
                 "ORDER BY id DESC " +
-                "LIMIT 1").get(0);
-        return Integer.parseInt(res.get(0));
-    }
-
-    private int getlastSSARow() {
-        List<String> res = dbconnector.execRead("SELECT timestamp_end FROM DW_station_sampled " +
-                "ORDER BY id DESC " +
-                "LIMIT 1").get(0);
-        return Integer.parseInt(res.get(0));
+                "LIMIT 1");
+        if(res!=null&&!res.isEmpty()&&res.get(0)!=null&&!res.get(0).isEmpty()){
+            return Integer.parseInt(res.get(0).get(0));
+        }
+        return getRangeStart();
     }
 
     // Fills the movements column with the absolute value of the difference between the actual available_bikes
@@ -74,6 +70,7 @@ public class StatisticsEngine {
     public void fillStationMeansTable(){
         int rangeEnd=getRangeEnd();
         int rangeStart=getRangeStart();
+        String strMovementWeather="round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather=";
         dbconnector.execWrite("INSERT INTO DW_station_means (id, id_station, week_day, range_start, range_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, movement_mean_rain, movement_mean_sun) " +
                 "(SELECT null,id_station, dayofweek(from_unixtime(" + rangeStart +
@@ -83,27 +80,24 @@ public class StatisticsEngine {
                 "round(AVG(movement_mean),1), " +
                 "round(AVG(availability_mean),1), " +
                 "round(AVG(velib_nb_mean),1), " +
-                "round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather='rain'),1), " +
-                "round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather='sun'),1) " +
+                strMovementWeather + "'rain'),1), " +
+                strMovementWeather + "'sun'),1) " +
                 "FROM DW_station_sampled)");
     }
 
     // Fills station sampled table with calculated statistics
     public void fillStationSampledTable(){
-        int lastRangeEnd=getlastSSARow();
+        int lastRangeEnd=getlastSSaRow();
         dbconnector.execWrite("INSERT INTO dw_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, weather) " +
-                "(select null, id_station, last_update, " +
-                "unix_timestamp(addtime(FROM_UNIXTIME(last_update), '00:30:00')), " +
-                "round(AVG(movements),1), round(AVG(available_bike_stands),1), round(AVG(available_bikes),1), null " +
-                "from dw_station_state " +
-                "WHERE last_update >= " + lastRangeEnd +
-                " GROUP BY round(last_update / 1800))");
-    }
-
-    private List<List<String>> getStatisticsPerDay(LocalDate date) {
-        List<List<String>> res = dbconnector.execRead("SELECT * FROM DW_station_means " +
-                "Where date(from_unixtime(range_start)) = " + java.sql.Date.valueOf(date));
-        return res;
+                "(select null, ss.id_station, ss.last_update, " +
+                "unix_timestamp(addtime(FROM_UNIXTIME(ss.last_update), '00:30:00')), " +
+                "round(AVG(ss.movements),1), round(AVG(ss.available_bike_stands),1), round(AVG(ss.available_bikes),1), w.weather_group " +
+                "from dw_station_state ss, dw_weather w, dw_station s " +
+                "WHERE ss.last_update >= " + lastRangeEnd +
+                " and w.calculation_time >= " + lastRangeEnd +
+                " and w.city_id = s.city_id " +
+                " and ss.id_station = s.id " +
+                " GROUP BY round(ss.last_update / 1800))");
     }
 }

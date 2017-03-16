@@ -112,4 +112,12 @@ public class SqlConnector {
             }
             return resList;
         }
+
+    public int execCount(String table, String where){
+        String query = "SELECT COUNT(*) FROM "+table;
+        if (where != null)
+            query += " WHERE "+where;
+        return Integer.parseInt(execRead(query).get(0).get(0));
+    }
+
 }

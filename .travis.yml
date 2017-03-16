@@ -1,0 +1,18 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+services:
+  - mysql
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_77ba23fbb4d5_key -iv $encrypted_77ba23fbb4d5_iv -in travis.tar.enc -out travis.tar -d
+  - tar xvf travis.tar
+  - cp travis/config-test.properties src/test/resources/
+  - mysql -e 'CREATE DATABASE filrouge_test;'
+  - mysql filrouge_test < init-script.sql
+  - mysql filrouge_test < src/test/resources/test-script.sql
+
+script:
+  - mvn package
