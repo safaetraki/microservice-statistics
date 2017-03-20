@@ -41,7 +41,7 @@ public class Application {
 
         // Run microservice
         new MicroservicesRunner()
-                .deploy(new StatisticsService())
+                .deploy(new StatisticsService(configFile))
                 .start();
     }
 }

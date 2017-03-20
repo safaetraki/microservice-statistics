@@ -16,3 +16,8 @@ before_install:
 
 script:
   - mvn package
+
+
+cache:
+  directories:
+    - $HOME/.m2/repository

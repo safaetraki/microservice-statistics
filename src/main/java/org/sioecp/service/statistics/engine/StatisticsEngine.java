@@ -6,9 +6,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Safae on 01/03/2017.
- */
+
 public class StatisticsEngine {
 
     private SqlConnector dbconnector;
@@ -17,33 +15,33 @@ public class StatisticsEngine {
         dbconnector = sql;
     }
 
-    private int getfirstSSRow() {
+    private long getfirstSSRow() {
         List<String> res = dbconnector.execRead("SELECT id FROM DW_station_state " +
                 "ORDER BY id ASC " +
                 "LIMIT 1").get(0);
-        return Integer.parseInt(res.get(0));
+        return Long.parseLong(res.get(0));
     }
 
-    private int getRangeStart() {
+    private long getRangeStart() {
         List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
                 "ORDER BY id ASC " +
                 "LIMIT 1").get(0);
-        return Integer.parseInt(res.get(0));
+        return Long.parseLong(res.get(0));
     }
 
-    private int getRangeEnd() {
+    private long getRangeEnd() {
         List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
                 "ORDER BY id DESC " +
                 "LIMIT 1").get(0);
-        return Integer.parseInt(res.get(0));
+        return Long.parseLong(res.get(0));
     }
 
-    private int getlastSSaRow() {
+    private long getlastSSaRow() {
         List<List<String>> res = dbconnector.execRead("SELECT timestamp_end FROM DW_station_sampled " +
                 "ORDER BY id DESC " +
                 "LIMIT 1");
         if(res!=null&&!res.isEmpty()&&res.get(0)!=null&&!res.get(0).isEmpty()){
-            return Integer.parseInt(res.get(0).get(0));
+            return Long.parseLong(res.get(0).get(0));
         }
         return getRangeStart();
     }
@@ -51,7 +49,7 @@ public class StatisticsEngine {
     // Fills the movements column with the absolute value of the difference between the actual available_bikes
     // and the available_bikes of the previous row for each row with the movements column null
     public void fillMovements(){
-        int firstRow=getfirstSSRow();
+        long firstRow=getfirstSSRow();
         dbconnector.execWrite("UPDATE dw_station_state as st_state, " +
                 "(select state.id as state_id, " +
                 "ABS(" +
@@ -68,8 +66,8 @@ public class StatisticsEngine {
 
     // Fills station means table with calculated statistics
     public void fillStationMeansTable(){
-        int rangeEnd=getRangeEnd();
-        int rangeStart=getRangeStart();
+        long rangeEnd=getRangeEnd();
+        long rangeStart=getRangeStart();
         String strMovementWeather="round(AVG(movement_mean)/(select count(weather) from DW_station_sampled where weather=";
         dbconnector.execWrite("INSERT INTO DW_station_means (id, id_station, week_day, range_start, range_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, movement_mean_rain, movement_mean_sun) " +
@@ -80,14 +78,14 @@ public class StatisticsEngine {
                 "round(AVG(movement_mean),1), " +
                 "round(AVG(availability_mean),1), " +
                 "round(AVG(velib_nb_mean),1), " +
-                strMovementWeather + "'rain'),1), " +
-                strMovementWeather + "'sun'),1) " +
+                strMovementWeather + "'Rain'),1), " +
+                strMovementWeather + "'Sun'),1) " +
                 "FROM DW_station_sampled)");
     }
 
     // Fills station sampled table with calculated statistics
     public void fillStationSampledTable(){
-        int lastRangeEnd=getlastSSaRow();
+        long lastRangeEnd=getlastSSaRow();
         dbconnector.execWrite("INSERT INTO dw_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, weather) " +
                 "(select null, ss.id_station, ss.last_update, " +

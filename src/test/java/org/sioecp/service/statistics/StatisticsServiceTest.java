@@ -6,9 +6,7 @@ import org.sioecp.service.statistics.tools.SqlConnector;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Created by Safae on 16/03/2017.
- */
+
 class StatisticsServiceTest {
     private static final String CONFIG_FILE_PATH = "src/test/resources/config-test.properties";
     private static SqlConnector sql;
@@ -36,20 +34,6 @@ class StatisticsServiceTest {
     }
 
     @Test
-    void testCalculateMeans() throws Exception {
-        // Count means rows before insert
-        int beforeRows = sql.execCount("DW_station_means",null);
-        assertEquals(0,beforeRows);
-
-        // Exec calculate means service
-        service.calculateMeans();
-
-        // Count means rows after insert
-        int afterRows = sql.execCount("DW_station_means",null);
-        assertEquals(1,afterRows);
-    }
-
-    @Test
     void testCalculateMeansSampled() throws Exception {
         // Count sampled rows before insert
         int beforeRows = sql.execCount("DW_station_sampled",null);
@@ -60,6 +44,20 @@ class StatisticsServiceTest {
 
         // Count sampled rows after insert
         int afterRows = sql.execCount("DW_station_sampled",null);
+        assertEquals(1,afterRows);
+    }
+
+    @Test
+    void testCalculateMeans() throws Exception {
+        // Count means rows before insert
+        int beforeRows = sql.execCount("DW_station_means",null);
+        assertEquals(0,beforeRows);
+
+        // Exec calculate means service
+        service.calculateMeans();
+
+        // Count means rows after insert
+        int afterRows = sql.execCount("DW_station_means",null);
         assertEquals(1,afterRows);
     }
 

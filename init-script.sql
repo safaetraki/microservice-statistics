@@ -1,12 +1,14 @@
-DROP TABLE IF EXISTS `fil_rouge`.`dw_weather`;
-DROP TABLE IF EXISTS `fil_rouge`.`dw_station_means`;
-DROP TABLE IF EXISTS `fil_rouge`.`dw_station_sampled`;
-DROP TABLE IF EXISTS `fil_rouge`.`dw_station_state`;
-DROP TABLE IF EXISTS `fil_rouge`.`dw_station`;
-DROP TABLE IF EXISTS `fil_rouge`.`dw_city`;
+DROP TABLE IF EXISTS `dw_weather`;
+DROP TABLE IF EXISTS `dw_station_means`;
+DROP TABLE IF EXISTS `dw_station_sampled`;
+DROP TABLE IF EXISTS `dw_station_state`;
+DROP TABLE IF EXISTS `dw_station`;
+DROP TABLE IF EXISTS `dw_city`;
+
+SET sql_mode = '';
 
 # Cleaned city list
-CREATE TABLE `fil_rouge`.`DW_city` (
+CREATE TABLE `DW_city` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -14,7 +16,7 @@ CREATE TABLE `fil_rouge`.`DW_city` (
 
 
 # Cleaned static stations infos
-CREATE TABLE `fil_rouge`.`DW_station` (
+CREATE TABLE `DW_station` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `station_number` int(11) DEFAULT NULL,
   `city_id` int(11) DEFAULT NULL,
@@ -32,7 +34,7 @@ CREATE TABLE `fil_rouge`.`DW_station` (
 
 
 # Cleaned weather
-CREATE TABLE `fil_rouge`.`DW_weather` (
+CREATE TABLE `DW_weather` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `city_id` int(11) DEFAULT NULL,
   `weather_group` varchar(45) DEFAULT NULL,
@@ -56,7 +58,7 @@ CREATE TABLE `fil_rouge`.`DW_weather` (
 
 
 # Cleaned states per station
-CREATE TABLE `fil_rouge`.`DW_station_state` (
+CREATE TABLE `DW_station_state` (
   `id` int(11) NOT NULL  AUTO_INCREMENT,
   `id_station` int(11) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
@@ -73,7 +75,7 @@ CREATE TABLE `fil_rouge`.`DW_station_state` (
 
 
 # Global means for each station, divided by day-time ranges
-CREATE TABLE `fil_rouge`.`DW_station_means` (
+CREATE TABLE `DW_station_means` (
   `id` int(11) NOT NULL  AUTO_INCREMENT,
   `id_station` int(11) NOT NULL,
   `week_day` int(3) DEFAULT NULL,
@@ -91,7 +93,7 @@ CREATE TABLE `fil_rouge`.`DW_station_means` (
 
 
 # Sampled data table, generated from DW_station_state
-CREATE TABLE `fil_rouge`.`DW_station_sampled` (
+CREATE TABLE `DW_station_sampled` (
   `id` int(11) NOT NULL  AUTO_INCREMENT,
   `id_station` int(11) NOT NULL,
   `timestamp_start` int(11) DEFAULT NULL,
