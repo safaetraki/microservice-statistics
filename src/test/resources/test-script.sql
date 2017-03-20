@@ -1,9 +1,9 @@
-delete from `dw_station_means`;
-delete from `dw_station_sampled`;
-delete from `dw_station_state`;
-delete from `dw_station`;
-delete from `dw_weather`;
-delete from `dw_city`;
+delete from `DW_station_means`;
+delete from `DW_station_sampled`;
+delete from `DW_station_state`;
+delete from `DW_station`;
+delete from `DW_weather`;
+delete from `DW_city`;
 
 INSERT INTO `DW_city` VALUES (1,'Paris');
 
