@@ -23,7 +23,7 @@ class StatisticsServiceTest {
     void testAddDifference() throws Exception {
         // Count rows with movements not calculated
         int noDifferenceRows = sql.execCount("DW_station_state","movements is null");
-        assertEquals(3,noDifferenceRows);
+        assertEquals(10,noDifferenceRows);
 
         // Exec add difference service
         service.addDifference();
@@ -44,7 +44,7 @@ class StatisticsServiceTest {
 
         // Count sampled rows after insert
         int afterRows = sql.execCount("DW_station_sampled",null);
-        assertEquals(1,afterRows);
+        assertEquals(10,afterRows);
     }
 
     @Test
@@ -58,7 +58,7 @@ class StatisticsServiceTest {
 
         // Count means rows after insert
         int afterRows = sql.execCount("DW_station_means",null);
-        assertEquals(1,afterRows);
+        assertEquals(10,afterRows);
     }
 
 }

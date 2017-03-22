@@ -24,21 +24,21 @@ public class StatisticsEngine {
 
     private long getRangeStart() {
         List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
-                "ORDER BY id ASC " +
+                "ORDER BY last_update ASC " +
                 "LIMIT 1").get(0);
         return Long.parseLong(res.get(0));
     }
 
     private long getRangeEnd() {
         List<String> res = dbconnector.execRead("SELECT last_update FROM DW_station_state " +
-                "ORDER BY id DESC " +
+                "ORDER BY last_update DESC " +
                 "LIMIT 1").get(0);
         return Long.parseLong(res.get(0));
     }
 
     private long getlastSSaRow() {
         List<List<String>> res = dbconnector.execRead("SELECT timestamp_end FROM DW_station_sampled " +
-                "ORDER BY id DESC " +
+                "ORDER BY timestamp_end DESC " +
                 "LIMIT 1");
         if(res!=null&&!res.isEmpty()&&res.get(0)!=null&&!res.get(0).isEmpty()){
             return Long.parseLong(res.get(0).get(0));
@@ -72,15 +72,15 @@ public class StatisticsEngine {
         dbconnector.execWrite("INSERT INTO DW_station_means (id, id_station, week_day, range_start, range_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, movement_mean_rain, movement_mean_sun) " +
                 "(SELECT null,id_station, dayofweek(from_unixtime(" + rangeStart +
-                ")), " + rangeStart +
-                ", " + rangeEnd +
-                ", " +
+                " * 0.001)), (" + rangeStart +
+                " * 0.001), (" + rangeEnd +
+                " * 0.001), " +
                 "round(AVG(movement_mean),1), " +
                 "round(AVG(availability_mean),1), " +
                 "round(AVG(velib_nb_mean),1), " +
                 strMovementWeather + "'Rain'),1), " +
                 strMovementWeather + "'Sun'),1) " +
-                "FROM DW_station_sampled)");
+                "FROM DW_station_sampled group by id_station)");
     }
 
     // Fills station sampled table with calculated statistics
@@ -88,14 +88,15 @@ public class StatisticsEngine {
         long lastRangeEnd=getlastSSaRow();
         dbconnector.execWrite("INSERT INTO dw_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, weather) " +
-                "(select null, ss.id_station, ss.last_update, " +
-                "unix_timestamp(addtime(FROM_UNIXTIME(ss.last_update), '00:30:00')), " +
-                "round(AVG(ss.movements),1), round(AVG(ss.available_bike_stands),1), round(AVG(ss.available_bikes),1), w.weather_group " +
-                "from dw_station_state ss, dw_weather w, dw_station s " +
-                "WHERE ss.last_update >= " + lastRangeEnd +
-                " and w.calculation_time >= " + lastRangeEnd +
+                "(select null, ss.id_station, (ss.last_update * 0.001) as time_start, " +
+                "unix_timestamp(addtime(FROM_UNIXTIME(ss.last_update * 0.001), '00:30:00')) as time_end, " +
+                "round(AVG(ss.movements),1), round(AVG(ss.available_bike_stands),1), round(AVG(ss.available_bikes),1), " +
+                "(select w.weather_group from dw_weather w, dw_station s " +
+                "where w.calculation_time >= time_start and w.calculation_time <= time_end"+ // lastRangeEnd +
                 " and w.city_id = s.city_id " +
-                " and ss.id_station = s.id " +
-                " GROUP BY round(ss.last_update / 1800))");
+                "and ss.id_station = s.id limit 1) " +
+                "from dw_station_state ss " +
+                "WHERE ss.last_update >= " + lastRangeEnd +
+                " GROUP BY ss.id_station, round(time_start / 1800))");
     }
 }
