@@ -17,6 +17,8 @@ before_install:
 script:
   - mvn package
 
+after_success:
+  - ./travisres/deploy.sh
 
 cache:
   directories:
