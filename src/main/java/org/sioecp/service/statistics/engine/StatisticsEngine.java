@@ -91,7 +91,7 @@ public class StatisticsEngine {
                 "(select null, ss.id_station, (ss.last_update * 0.001) as time_start, " +
                 "unix_timestamp(addtime(FROM_UNIXTIME(ss.last_update * 0.001), '00:30:00')) as time_end, " +
                 "round(AVG(ss.movements),1), round(AVG(ss.available_bike_stands),1), round(AVG(ss.available_bikes),1), " +
-                "(select w.weather_group from dw_weather w, DW_station s " +
+                "(select w.weather_group from DW_weather w, DW_station s " +
                 "where w.calculation_time >= time_start and w.calculation_time <= time_end"+ // lastRangeEnd +
                 " and w.city_id = s.city_id " +
                 "and ss.id_station = s.id limit 1) " +
