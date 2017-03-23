@@ -50,15 +50,15 @@ public class StatisticsEngine {
     // and the available_bikes of the previous row for each row with the movements column null
     public void fillMovements(){
         long firstRow=getfirstSSRow();
-        dbconnector.execWrite("UPDATE dw_station_state as st_state, " +
+        dbconnector.execWrite("UPDATE DW_station_state as st_state, " +
                 "(select state.id as state_id, " +
                 "ABS(" +
                 "state.available_bikes - " +
-                "(SELECT st.available_bikes FROM dw_station_state as st " +
+                "(SELECT st.available_bikes FROM DW_station_state as st " +
                 "where st.id = state.id - 1)" +
                 ") " +
                 "as move " +
-                "from dw_station_state as state " +
+                "from DW_station_state as state " +
                 "WHERE state.movements is null AND state.id <> "+ firstRow +") as calculus " +
                 "SET st_state.movements = calculus.move " +
                 "WHERE st_state.id = calculus.state_id");
@@ -86,16 +86,16 @@ public class StatisticsEngine {
     // Fills station sampled table with calculated statistics
     public void fillStationSampledTable(){
         long lastRangeEnd=getlastSSaRow();
-        dbconnector.execWrite("INSERT INTO dw_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
+        dbconnector.execWrite("INSERT INTO DW_station_sampled (id, id_station, timestamp_start, timestamp_end, " +
                 "movement_mean, availability_mean, velib_nb_mean, weather) " +
                 "(select null, ss.id_station, (ss.last_update * 0.001) as time_start, " +
                 "unix_timestamp(addtime(FROM_UNIXTIME(ss.last_update * 0.001), '00:30:00')) as time_end, " +
                 "round(AVG(ss.movements),1), round(AVG(ss.available_bike_stands),1), round(AVG(ss.available_bikes),1), " +
-                "(select w.weather_group from dw_weather w, dw_station s " +
+                "(select w.weather_group from dw_weather w, DW_station s " +
                 "where w.calculation_time >= time_start and w.calculation_time <= time_end"+ // lastRangeEnd +
                 " and w.city_id = s.city_id " +
                 "and ss.id_station = s.id limit 1) " +
-                "from dw_station_state ss " +
+                "from DW_station_state ss " +
                 "WHERE ss.last_update >= " + lastRangeEnd +
                 " GROUP BY ss.id_station, round(time_start / 1800))");
     }
