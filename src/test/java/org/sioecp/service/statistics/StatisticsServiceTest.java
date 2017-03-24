@@ -16,7 +16,7 @@ class StatisticsServiceTest {
     static void setUp() throws Exception {
         sql = new SqlConnector();
         sql.importPropertiesFromFile(CONFIG_FILE_PATH);
-        service = new StatisticsService(CONFIG_FILE_PATH);
+        service = new StatisticsService(CONFIG_FILE_PATH,1000);
     }
 
     @Test

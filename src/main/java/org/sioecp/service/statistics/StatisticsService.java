@@ -16,13 +16,13 @@
 
 package org.sioecp.service.statistics;
 
-import org.sioecp.service.statistics.engine.StatisticsEngine;
+import org.sioecp.service.statistics.engine.AStatisticsEngine;
+import org.sioecp.service.statistics.engine.FillMovementsEngine;
+import org.sioecp.service.statistics.engine.SampleStatisticsEngine;
+import org.sioecp.service.statistics.engine.StationMeansEngine;
 import org.sioecp.service.statistics.tools.SqlConnector;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
@@ -33,8 +33,9 @@ public class StatisticsService {
 
     private String propertiesPath;
 
-    public StatisticsService(String propertiesPath){
+    public StatisticsService(String propertiesPath, int maxRowToClean){
         this.propertiesPath = propertiesPath;
+        AStatisticsEngine.MAXROWS = maxRowToClean;
     }
 
     @GET
@@ -44,11 +45,11 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init StatisticsEngine class
-        StatisticsEngine engine = new StatisticsEngine(sql);
+        // Init AStatisticsEngine class
+        FillMovementsEngine engine = new FillMovementsEngine(sql);
 
         // Start filling movements
-        engine.fillMovements();
+        engine.runCleaning();
     }
 
     @GET
@@ -58,8 +59,8 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init StatisticsEngine class
-        StatisticsEngine engine = new StatisticsEngine(sql);
+        // Init AStatisticsEngine class
+        StationMeansEngine engine = new StationMeansEngine(sql);
 
         // Start filling movements
         engine.fillStationMeansTable();
@@ -72,10 +73,10 @@ public class StatisticsService {
         SqlConnector sql = new SqlConnector();
         sql.importPropertiesFromFile(propertiesPath);
 
-        // Init StatisticsEngine class
-        StatisticsEngine engine = new StatisticsEngine(sql);
+        // Init AStatisticsEngine class
+        SampleStatisticsEngine engine = new SampleStatisticsEngine(sql);
 
         // Start filling movements
-        engine.fillStationSampledTable();
+        engine.runCleaning();
     }
 }

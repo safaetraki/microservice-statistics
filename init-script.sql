@@ -107,3 +107,10 @@ CREATE TABLE `DW_station_sampled` (
   KEY `id_station_idx` (`id_station`),
   CONSTRAINT `id_st3` FOREIGN KEY (`id_station`) REFERENCES `DW_station` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `MS_DataCleaning_conf` (
+  `name` varchar(45) NOT NULL,
+  `value` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

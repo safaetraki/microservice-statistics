@@ -28,6 +28,8 @@ public class Application {
     static int port = 8080;
     // Default config file
     static String configFile = "config.properties";
+    // Max row to clean
+    static int maxRowToClean = 1000;
 
     public static void main(String[] args) {
         // Handle parameters
@@ -37,11 +39,13 @@ public class Application {
                 port = Integer.parseInt(args[i+1]);
             else if (args[i].equals("-conf"))
                 configFile = args[i+1];
+            else if (args[i].equals("-maxrow"))
+                maxRowToClean = Integer.parseInt(args[i+1]);
         }
 
         // Run microservice
-        new MicroservicesRunner()
-                .deploy(new StatisticsService(configFile))
+        new MicroservicesRunner(port)
+                .deploy(new StatisticsService(configFile,maxRowToClean))
                 .start();
     }
 }
