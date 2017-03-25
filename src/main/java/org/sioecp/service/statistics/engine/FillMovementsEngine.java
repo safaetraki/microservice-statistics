@@ -19,7 +19,8 @@ public class FillMovementsEngine extends AStatisticsEngine {
                 "ABS(" +
                 "state.available_bikes - " +
                 "(SELECT st.available_bikes FROM DW_station_state as st " +
-                "where st.id = state.id - 1)" +
+                "where st.last_update < state.last_update and st.id_station = state.id_station " +
+                "order by st.last_update desc limit 1)" +
                 ") " +
                 "as move " +
                 "from DW_station_state as state " +

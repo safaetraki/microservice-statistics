@@ -23,14 +23,14 @@ class StatisticsServiceTest {
     void testAddDifference() throws Exception {
         // Count rows with movements not calculated
         int noDifferenceRows = sql.execCount("DW_station_state","movements is null");
-        assertEquals(10,noDifferenceRows);
+        assertEquals(13,noDifferenceRows);
 
         // Exec add difference service
         service.addDifference();
 
         // Count rows with movements calculated
         int differenceRows = sql.execCount("DW_station_state","movements is null");
-        assertEquals(1,differenceRows);
+        assertEquals(10,differenceRows);
     }
 
     @Test
